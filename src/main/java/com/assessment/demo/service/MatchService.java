@@ -4,6 +4,7 @@ import com.assessment.demo.domain.Match;
 import com.assessment.demo.domain.Sport;
 
 import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link MatchService} interface specifies the methods that need to be implemented for handling {@link Match}
@@ -13,7 +14,7 @@ public interface MatchService {
   /**
    * Saves the given {@link Match}
    */
-  void createMatch(Match match);
+  void createMatch(final Match match);
 
   void createMatches();
 
@@ -21,6 +22,8 @@ public interface MatchService {
 
   List<Match> getAllMatchesBySport(final Sport sport);
 
+  Optional<Match> getMatchById(final Long matchId);
 
-  List<Match> getMatchById(Long matchId);
+  boolean matchExists(final Long matchId);
+
 }

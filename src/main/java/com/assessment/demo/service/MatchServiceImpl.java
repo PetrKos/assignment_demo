@@ -9,6 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 /**
  * {@link MatchServiceImpl} implements the methods needed for handling a {@link Match}
@@ -39,8 +40,13 @@ public class MatchServiceImpl implements MatchService {
 
 
   @Override
-  public List<Match> getMatchById(Long sport) {
-    return null;
+  public Optional<Match> getMatchById(Long matchId) {
+    return matchRepository.findById(matchId);
+  }
+
+  @Override
+  public boolean matchExists(Long matchId) {
+    return matchRepository.existsById(matchId);
   }
 
 
@@ -57,6 +63,10 @@ public class MatchServiceImpl implements MatchService {
 
     log.info("New match created");
   }
+
+
+
+
 
   @Override
   public void createMatches() {

@@ -27,7 +27,7 @@ public class MatchController {
   /**
    * Retrieves all matches for all sports.
    */
-  @GetMapping(value = "/api/v1/matches",produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/api/v1/matches", produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Match> getAllMatches() {
     return matchService.getEveryMatch();
   }
@@ -35,13 +35,14 @@ public class MatchController {
   /**
    * Retrieves all matches by a certain sport.
    */
-  @GetMapping(value = "/api/v1/matches/{sport}",produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/api/v1/matches/{sport}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public List<Match> getAllMatchesBySport(@PathVariable Sport sport) {
     return matchService.getAllMatchesBySport(sport);
   }
 
   /**
    * Retrieves a match witch a specific an id
+   *
    * @param matchId the id of the match.
    */
   @GetMapping(value = "/api/v1/matches/{id}", produces = "application/json")
@@ -51,6 +52,7 @@ public class MatchController {
 
   /**
    * CReates a match
+   *
    * @param matchDto
    * @return
    */
@@ -67,7 +69,6 @@ public class MatchController {
     matchService.createMatches();
     return "games loaded";
   }
-
 
 
 }
