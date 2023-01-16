@@ -7,10 +7,13 @@ import com.assessment.demo.transport.MatchDto;
 import com.assessment.demo.transport.mappers.MatchMapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -19,7 +22,7 @@ import java.util.List;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/demo")
+@RequestMapping("/demo/api/v1/")
 public class MatchController {
 
   private final MatchService matchService;
@@ -27,7 +30,7 @@ public class MatchController {
   /**
    * Retrieves all matches for all sports.
    */
-  @GetMapping(value = "/api/v1/matches", produces = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/matches", produces = MediaType.APPLICATION_JSON_VALUE)
   public List<Match> getAllMatches() {
     return matchService.getEveryMatch();
   }
@@ -35,7 +38,7 @@ public class MatchController {
   /**
    * Retrieves all matches by a certain sport.
    */
-  @GetMapping(value = "/api/v1/matches/{sport}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "/matches/{sport}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public List<Match> getAllMatchesBySport(@PathVariable Sport sport) {
     return matchService.getAllMatchesBySport(sport);
   }
@@ -45,9 +48,15 @@ public class MatchController {
    *
    * @param matchId the id of the match.
    */
-  @GetMapping(value = "/api/v1/matches/{id}", produces = "application/json")
-  public String getMatch(@PathVariable("id") Long matchId) {
-    return "hello";
+  @GetMapping(value = "/matches/{id}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<MatchDto> getMatch(@PathVariable("id") Long matchId) {
+    Optional<Match> matchById = matchService.getMatchById(matchId);
+    if(matchById.isPresent()){
+      Match match = matchById.get();
+      MatchDto matchDto = MatchMapper.INSTANCE.matchToMatchDto(match);
+      return new ResponseEntity<>(matchDto, HttpStatus.OK);
+    }
+    return new ResponseEntity<>(MatchDto.builder().build(), HttpStatus.NOT_FOUND);
   }
 
   /**
@@ -56,7 +65,7 @@ public class MatchController {
    * @param matchDto
    * @return
    */
-  @PostMapping(value = "/api/v1/matches", produces = "application/json")
+  @PostMapping(value = "/matches", produces = "application/json")
   public String createMatch(@RequestBody MatchDto matchDto) {
     Match match = MatchMapper.INSTANCE.matchDtoToMatch(matchDto);
     matchService.createMatch(match);

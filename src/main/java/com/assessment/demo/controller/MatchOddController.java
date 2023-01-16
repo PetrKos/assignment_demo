@@ -1,5 +1,6 @@
 package com.assessment.demo.controller;
 
+import com.assessment.demo.controller.handler.ErrorResponse;
 import com.assessment.demo.domain.Match;
 import com.assessment.demo.domain.MatchOdd;
 import com.assessment.demo.service.MatchOddService;
@@ -21,13 +22,13 @@ import java.util.Optional;
 @Slf4j
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/demo")
-public class MatchOddController {
+@RequestMapping("/api/v1/")
+public class MatchOddController extends ErrorResponse {
 
   private final MatchService matchService;
   private final MatchOddService matchOddService;
 
-  @GetMapping(value = "/api/v1/matchOdds/{matchId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @GetMapping(value = "matchOdds/{matchId}", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<List<MatchOddDto>> getMatchOddsForGame(@PathVariable final Long matchId) {
     Optional<Match> match = Optional.ofNullable(matchService.getMatchById(matchId).orElseThrow(() -> new IllegalArgumentException("Match not found")));//could return custom exception with meaningful message.
     if (match.isEmpty()) {
@@ -48,7 +49,7 @@ public class MatchOddController {
   }
 
 
-  @PostMapping(value = "/api/v1/{matchId}/matchOdd", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  @PostMapping(value = "/{matchId}/matchOdd", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
   public ResponseEntity<?> createMatchOddForGame(@PathVariable Long matchId, @RequestBody MatchOddDto matchOddDto) {
 
     Optional<Match> match = Optional.ofNullable(matchService.getMatchById(matchId).orElseThrow(() -> new IllegalArgumentException("Match not found")));
@@ -58,6 +59,20 @@ public class MatchOddController {
       MatchOdd matchOdd = MatchOddMapper.INSTANCE.matchOddDtoToMatchOdd(matchOddDto);
       matchOddService.createMatchOddForSpecificMatch(matchOdd);
       return new ResponseEntity<>("Created", HttpStatus.OK);
+    }
+    return new ResponseEntity<>(MatchOddDto.builder().build(), HttpStatus.BAD_REQUEST);
+  }
+
+  @PutMapping(value = "/api/v1/{matchId}/matchOdd", produces = MediaType.APPLICATION_JSON_VALUE, consumes = MediaType.APPLICATION_JSON_VALUE)
+  public ResponseEntity<?> updateMatchOddForGame(@PathVariable Long matchId, @RequestBody MatchOddDto matchOddDto) {
+
+    Optional<Match> match = Optional.ofNullable(matchService.getMatchById(matchId).orElseThrow(() -> new IllegalArgumentException("Match not found")));
+    if (match.isPresent()) {
+      Match existingMatch = match.get();
+      log.info("Found match with id[{}] and description[{}]", existingMatch.getId(), existingMatch.getDescription());
+      MatchOdd matchOdd = MatchOddMapper.INSTANCE.matchOddDtoToMatchOdd(matchOddDto);
+      matchOddService.createMatchOddForSpecificMatch(matchOdd);
+      return new ResponseEntity<>("Updated", HttpStatus.OK);
     }
     return new ResponseEntity<>(MatchOddDto.builder().build(), HttpStatus.BAD_REQUEST);
   }
